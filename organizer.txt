@@ -1,5 +1,6 @@
 //task
 
 - initialize folder with defined structures reg list, caregivers and list of served
-- go through documents and sort into directories by name
-- 
+- go through documents and sort and copy into directories by name
+- change file names to save based on timestamp
+- automate for the script to listen to changes in download
