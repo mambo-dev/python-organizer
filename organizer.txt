@@ -1,0 +1,5 @@
+//task
+
+- initialize folder with defined structures reg list, caregivers and list of served
+- go through documents and sort into directories by name
+- 
