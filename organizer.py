@@ -13,6 +13,9 @@ def create_dir(path):
 
 
 def initialize_directories(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
     for directory in storage_directories:
         dir_path = os.path.join(path,directory)
         create_dir(dir_path)
@@ -72,7 +75,7 @@ def update_file_names(document_path):
     for root, dirs, files in os.walk(document_path):
         for file in files:
             correct_format = False
-            if  "registration-list" in file.lower() or "caseplan-list" in file.lower() or "ovc-served" in file.lower():
+            if  "registration-list" in file.lower() or "caseplan-list" in file.lower() or "ovc-served" in file.lower() or "caregivers-list" in file.lower():
                 correct_format = True
             
             if not correct_format:
