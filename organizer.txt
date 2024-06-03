@@ -2,5 +2,6 @@
 
 - initialize folder with defined structures reg list, caregivers and list of served
 - go through documents and sort and copy into directories by name
+- rename before copying the files into the organized folder
 - change file names to save based on timestamp
 - automate for the script to listen to changes in download
