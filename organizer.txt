@@ -4,5 +4,6 @@
 - go through documents and sort and copy into directories by name -done 
 - rename before copying the files into the organized folder - done
 - change file names to save based on timestamp - done
-- automate for the script to listen to changes in download - ongoing
+- automate for the script to listen to changes in documents file - ongoing
+- point it towards the download folder
 - package it to work on computers
