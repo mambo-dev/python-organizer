@@ -1,6 +1,9 @@
 import os
 import shutil
+import time
 from datetime import datetime
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 
 ORGANIZED_TARGET= "organized"
@@ -10,7 +13,6 @@ storage_directories = ["registration list", "list of served", "caseplan served",
 def create_dir(path):
     if not os.path.exists(path):
         os.mkdir(path)
-
 
 def initialize_directories(path):
     if not os.path.exists(path):
@@ -44,7 +46,6 @@ def sort_document_paths(path):
   
     return reg_list_paths, list_served_paths, caseplan_served_paths, caregiver_served_paths
 
-
 def move_document_to_organized(organized_path, documents_path):
     reg_list_paths, list_served_paths, caseplan_served_paths, caregiver_served_paths = sort_document_paths(documents_path) 
     copy_to_organized(reg_list_paths,storage_directories[0],organized_path, documents_path)
@@ -52,8 +53,6 @@ def move_document_to_organized(organized_path, documents_path):
     copy_to_organized(caseplan_served_paths,storage_directories[2],organized_path, documents_path)
     copy_to_organized(caregiver_served_paths,storage_directories[3],organized_path, documents_path)
     return True
-
-  
 
 def copy_to_organized(files, storage_dir_name, organized_path, documents_path):
     path_to_store = os.path.join(organized_path, storage_dir_name)
@@ -75,6 +74,7 @@ def update_file_names(document_path):
     for root, dirs, files in os.walk(document_path):
         for file in files:
             correct_format = False
+            valid_file = False
             if  "registration-list" in file.lower() or "caseplan-list" in file.lower() or "ovc-served" in file.lower() or "caregivers-list" in file.lower():
                 correct_format = True
             
@@ -103,6 +103,16 @@ def update_file_names(document_path):
                     raise Exception("Invalid file name")
 
 
+class myHandler(FileSystemEventHandler):
+    def on_any_event(self,event):
+        if event.is_directory:
+            return None
+
+        if event.event_type == "created":
+            main()
+
+
+
 
 def main():
     cwd = os.getcwd()
@@ -113,5 +123,18 @@ def main():
     move_document_to_organized(organized_path, documents_path)
 
 if __name__ == "__main__":
-    main()
+    cwd = os.getcwd()
+    path = os.path.join(cwd,"documents")
+    event_handler = myHandler()
+    observer  = Observer()
+    observer.schedule(event_handler,path,recursive=True)
+    observer.start()
+    
 
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+
+    observer.join()
