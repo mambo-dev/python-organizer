@@ -3,7 +3,8 @@ import shutil
 import time
 from datetime import datetime
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileSystemEventHandler, PatternMatchingEventHandler
+from pathlib import Path
 
 
 ORGANIZED_TARGET= "organized"
@@ -62,6 +63,11 @@ def copy_to_organized(files, storage_dir_name, organized_path, documents_path):
         if not os.path.exists(dest):
             shutil.copy(source, path_to_store)
 
+def move_file(source, destination):
+    if not os.path.exists(dest):
+        shutil.move(source,destination)
+
+
 def change_file_name(file_path, new_file_path):
     try:
         os.rename(file_path, new_file_path)
@@ -102,16 +108,38 @@ def update_file_names(document_path):
                 else:
                     raise Exception("Invalid file name")
 
+def move_from_downloads_to_documents():
+    pass
 
 class myHandler(FileSystemEventHandler):
     def on_any_event(self,event):
         if event.is_directory:
             return None
-
+        
+        print("when downloading", os.getcwd())
         if event.event_type == "created":
-            main()
+            should_activate = False
+            incoming_files = []
+            for root,dirs,files in os.walk(os.getcwd()):
+                print(files)
+            if should_activate:
+                main()
 
 
+def get_default_download_directory():
+    download_dir = None
+    if os.name == "nt":
+        download_dir = Path(os.path.join(os.environ("USER_PROFILE"),"Downloads"))
+
+    elif os.name == "posix":
+        home_path = Path.home()
+        if os.path.exists(os.path.join(home_path,"Downloads")):
+            download_dir = os.path.join(home_path,"Downloads")
+        else:
+            download_dir = home_path
+    else:
+        raise Exception("we currently do not support this os")
+    return download_dir
 
 
 def main():
@@ -125,10 +153,17 @@ def main():
 if __name__ == "__main__":
     cwd = os.getcwd()
     path = os.path.join(cwd,"documents")
+    download_dir = get_default_download_directory()
+    os.chdir(download_dir)
+    path = download_dir
+
+
     event_handler = myHandler()
     observer  = Observer()
     observer.schedule(event_handler,path,recursive=True)
     observer.start()
+    
+    
     
 
     try:
